@@ -55,21 +55,19 @@ int main() {
 	VertexBuffer* triangle_vertex_buffer = new VertexBuffer({ triangle });
 	triangle_vertex_buffer->allocate(queue, commandBuffer, VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
 
-	mat4 transformMat = mat4({ 1,0,0,0,
-														 0,1,0,0,
-														 0,0,1,0,
-														 0,0,0,1 });
-	TransformBuffer* transform = new TransformBuffer(transformMat);
+	VkTransformMatrixKHR transformMatrixKHR = { 1,0,0,0,
+																						0,1,0,0,
+																						0,0,1,0 };
+
+	TransformBuffer* transform = new TransformBuffer(transformMatrixKHR);
 	transform->allocate(queue, commandBuffer);
 
 	BottomLevelAS blAS;
 	blAS.addVertexBuffer(triangle_vertex_buffer, transform, true);
-	blAS.allocate(queue, commandBuffer, transformMat);
+	blAS.allocate(queue, commandBuffer);
 
 	TopLevelAS tlAS;
-	VkTransformMatrixKHR transformMatrixKHR = { 1,0,0,0,
-																							0,1,0,0,
-																							0,0,1,0};
+
 
 	tlAS.addInstance(&blAS, transformMatrixKHR, 0, 0);
 	tlAS.alloctate(queue, commandBuffer, false);
@@ -96,7 +94,7 @@ int main() {
 	ClosestHitShaderModule closesHitShaderModule("Data/Shaders/HelloWorld/closesthit.rchit.spv");
 
 	RayTracingPipeline rtPipeline(vec2u({ size.width, size.height }));
-	rtPipeline.setAccelerationStructure(&tlAS, 0);
+	rtPipeline.addAccelerationStructure(&tlAS, VK_SHADER_STAGE_RAYGEN_BIT_KHR , 0);
 	rtPipeline.addStorageImage(&output, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1);
 	rtPipeline.addUniformBuffer(&proj, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 2);
 
