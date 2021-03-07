@@ -44,23 +44,23 @@ int main() {
 
 	//we create a indexed triangle mesh with the desired format
 	
-	std::vector<Data*> materials;
+	std::array<std::array<float, 8>,4> materials;
 
 	//light material
-	materials.push_back(new v<float,8>({ 0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,0.0f, 0.0f }));
+	materials[0] = std::array<float,8>({ 0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,0.0f, 0.0f });
 	//white material
-	materials.push_back(new v<float, 8>({ 1.0f,.824f,0.549f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
+	materials[1] = std::array<float, 8>({ 1.0f,.824f,0.549f,0.0f,0.0f,0.0f,0.0f, 0.0f });
 	//green material
-	materials.push_back(new v<float, 8>({ 0.0f,0.4f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
+	materials[2] =  std::array<float, 8>({ 0.0f,0.4f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f });
 	//red material
-	materials.push_back(new v<float, 8>({ 0.7f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
+	materials[3] = std::array<float, 8>({ 0.7f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f });
 
 	UniformBuffer materialBuffer;
-	materialBuffer.addVariable("material",&materials);
+	materialBuffer.addVariable("material",materials);
 	materialBuffer.end();
 
 
-	std::vector<Data*> samples;
+	std::array<vec4f,64> samples;
 	srand(time(NULL));
 	for (unsigned int i = 0; i < 64; i++)
 	{
@@ -71,18 +71,18 @@ int main() {
 
 		noise = Normalize(noise) ;
 
-		samples.push_back(new vec4f({ noise[0], noise[1], noise[2],0.0 }));
+		samples[i] = vec4f({ noise[0], noise[1], noise[2],0.0 });
 	}
 
 	UniformBuffer sampleBuffer;
-	sampleBuffer.addVariable("sample", &samples);
+	sampleBuffer.addVariable("sample", samples);
 	sampleBuffer.end();
 	
 	//547.8
 
 	float ligthY = 547.8f;
 
-	std::vector<Data*> lightSample;
+	std::array<vec4f,64> lightSample;
 	srand(time(NULL));
 	for (unsigned int i = 0; i < 64; i++)
 	{
@@ -95,12 +95,12 @@ int main() {
 		float y = ligthY;
 		float z = 227.0 + (332.0 - 227.0) * uv[1];
 
-		lightSample.push_back(new vec4f({ x, y, z,0.0 }));
+		lightSample[i] = (vec4f({ x, y, z,0.0 }));
 	}
 
 
 	UniformBuffer lightSampleBuffer;
-	lightSampleBuffer.addVariable("sample", &lightSample);
+	lightSampleBuffer.addVariable("sample", lightSample);
 	lightSampleBuffer.end();
 
 	Mesh_t* light = new IndexedMesh<TRIANGLE>(format);
@@ -362,10 +362,10 @@ int main() {
 
 	UniformBuffer proj;
 
-	proj.addVariable("CameraPos", &vec4f({ 278, 273, -800,0 }));
-	proj.addVariable("Direction", &vec4f({ 0, 0, 1,0 }));
-	proj.addVariable("horizontal", &vec4f({ 1, 0, 0,0 }));
-	proj.addVariable("Up", &vec3f({ 0, 1, 0}));
+	proj.addVariable("CameraPos", vec4f({ 278, 273, -800,0 }));
+	proj.addVariable("Direction", vec4f({ 0, 0, 1,0 }));
+	proj.addVariable("horizontal", vec4f({ 1, 0, 0,0 }));
+	proj.addVariable("Up", vec3f({ 0, 1, 0}));
 	proj.addVariable("focale", 1.4f);
 	proj.addVariable("width", 0.025f);
 	proj.addVariable("height", 0.025f);
@@ -420,7 +420,7 @@ int main() {
 	quad_vertex_buffer->allocate(queue, commandBuffer);
 
 	UniformBuffer* passNumber = new UniformBuffer();
-	passNumber->addVariable("dimention", &LavaCake::vec2u({ size.width, size.height }));
+	passNumber->addVariable("dimention", LavaCake::vec2u({ size.width, size.height }));
 	passNumber->end();
 
 

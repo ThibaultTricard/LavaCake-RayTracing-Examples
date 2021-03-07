@@ -77,11 +77,11 @@ int main() {
 
 
 	UniformBuffer proj;
-	proj.addVariable("viewInverse", &mat4({1.0,0.0,0.0,0.0,
+	proj.addVariable("viewInverse", mat4({1.0,0.0,0.0,0.0,
 																				 0.0,1.0,0.0,0.0,
 																				 0.0,0.0,1.0,0.0,
 																				 0.0,0.0,2.5,1.0 }));
-	proj.addVariable("projInverse", &mat4({ 1.0264,0.0,0.0,0.0,
+	proj.addVariable("projInverse", mat4({ 1.0264,0.0,0.0,0.0,
 																				 0.0,0.5774,0.0,0.0,
 																				 0.0,0.0,0.0,-10.0,
 																				 0.0,0.0,-1.0,10.0 }));
@@ -130,7 +130,7 @@ int main() {
 	quad_vertex_buffer->allocate(queue, commandBuffer);
 
 	UniformBuffer* passNumber = new UniformBuffer();
-	passNumber->addVariable("dimention", &LavaCake::vec2u({ size.width, size.height }));
+	passNumber->addVariable("dimention", LavaCake::vec2u({ size.width, size.height }));
 	passNumber->end();
 
 
