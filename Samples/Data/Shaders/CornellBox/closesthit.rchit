@@ -1,11 +1,12 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
 #extension GL_EXT_nonuniform_qualifier : enable
-
+ 
 struct RayPayload {
 	vec3 color;
 	int depth;
 	bool missed;
+  bool lightRay;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload hitValue;
@@ -30,6 +31,11 @@ layout(binding = 6, set = 0) uniform samplesBuffer
 {
 	vec4 dir[64];
 } samples;
+
+layout(binding = 7, set = 0) uniform lightSamplesBuffer 
+{
+  vec4 dir[64];
+} lightSamples;
 
 struct Vertex
 {
@@ -78,25 +84,61 @@ void main()
   vec3 diffuse = vec3(v0.mat.diffR, v0.mat.diffG, v0.mat.diffB);
   int depth = hitValue.depth;
   hitValue.depth = depth +1;
-  if(depth < 10)
-  {
-	  for(int i = 0; i < SAMPLE_NUMBER; i++)
-	  {
 
-	  	uint s = (shift* (i+1) *(depth+1)) % 64;
+  hitValue.missed = false;
 
-	  	vec3 rayDir = normalize(tan * samples.dir[s].x + bitan * samples.dir[s].y + n * samples.dir[s].z);
+  vec3 irradiance = vec3(0);
 
-	  	traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin, tmin, rayDir, tmax, 0);
 
-	  	float theta = dot(rayDir, n);
+  if(!hitValue.lightRay && v0.mat.emR < 0.5){
 
-	  	result+= hitValue.color*diffuse* theta/float(SAMPLE_NUMBER);
+    if(depth < 4)
+    {
+      for(int i = 0; i < 32; i++){
+        vec3 rayDir = normalize(lightSamples.dir[i].xyz - origin);
 
-	  }
+        float theta = dot(rayDir, n);
+        hitValue.lightRay = true;
+        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin, tmin, rayDir, tmax, 0);
+
+        hitValue.lightRay = false;
+
+        irradiance+= hitValue.color * theta;
+      }
+      irradiance  =  irradiance / 32.0;
+  	  
+      result = irradiance;
+
+      int lostRays = 0;
+      vec3 indirect = vec3(0.0);
+      for(int i = 0; i < SAMPLE_NUMBER; i++)
+  	  {
+
+
+  	  	uint s = (shift* (i+1) *(depth+1)) % 64;
+
+  	  	vec3 rayDir = normalize(tan * samples.dir[s].x + bitan * samples.dir[s].y + n * samples.dir[s].z);
+
+  	  	traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin, tmin, rayDir, tmax, 0);
+
+  	  	float theta = dot(rayDir, n);
+
+        if(hitValue.missed){
+          lostRays++;
+          hitValue.missed = false;
+        }
+  	  	indirect+= hitValue.color* theta;
+
+  	  }
+
+      if(SAMPLE_NUMBER - lostRays != 0){
+        indirect = indirect / float(SAMPLE_NUMBER - lostRays);
+      }
+
+      result = (result+indirect)*diffuse;
+
+     }
    }
-
-
   hitValue.color = result;
   hitValue.depth = depth;
 

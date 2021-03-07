@@ -14,21 +14,17 @@ using namespace LavaCake::Framework;
 using namespace LavaCake::Core;
 using namespace LavaCake::RayTracing;
 
-struct material_t {
-	float diff[3];
-	float emis[3];
-};
 
 float lerp(float a, float b, float f)
 {
 	return a + f * (b - a);
-}
-
+} 
+ 
 int main() {
 
 	ErrorCheck::PrintError();
 
-	Window w("LavaCake: Raytracing HelloWorld", 500 , 500);
+	Window w("LavaCake: Raytracing Cornell Box", 500 , 500);
 	
 
 	Device* d = Device::getDevice();
@@ -53,11 +49,11 @@ int main() {
 	//light material
 	materials.push_back(new v<float,8>({ 0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,0.0f, 0.0f }));
 	//white material
-	materials.push_back(new v<float, 8>({ 1.0f,1.0f,1.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
+	materials.push_back(new v<float, 8>({ 1.0f,.824f,0.549f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
 	//green material
-	materials.push_back(new v<float, 8>({ 0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
+	materials.push_back(new v<float, 8>({ 0.0f,0.4f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
 	//red material
-	materials.push_back(new v<float, 8>({ 1.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
+	materials.push_back(new v<float, 8>({ 0.7f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f }));
 
 	UniformBuffer materialBuffer;
 	materialBuffer.addVariable("material",&materials);
@@ -81,13 +77,42 @@ int main() {
 	UniformBuffer sampleBuffer;
 	sampleBuffer.addVariable("sample", &samples);
 	sampleBuffer.end();
+	
+	//547.8
+
+	float ligthY = 547.8f;
+
+	std::vector<Data*> lightSample;
+	srand(time(NULL));
+	for (unsigned int i = 0; i < 64; i++)
+	{
+		vec2f uv({
+			(float)rand() / (float)RAND_MAX,
+			(float)rand() / (float)RAND_MAX, });
+
+
+		float x = 213.0 + (343.0 - 213.0) * uv[0];
+		float y = ligthY;
+		float z = 227.0 + (332.0 - 227.0) * uv[1];
+
+		lightSample.push_back(new vec4f({ x, y, z,0.0 }));
+	}
+
+
+	UniformBuffer lightSampleBuffer;
+	lightSampleBuffer.addVariable("sample", &lightSample);
+	lightSampleBuffer.end();
 
 	Mesh_t* light = new IndexedMesh<TRIANGLE>(format);
 
-	light->appendVertex({ 343.0, 547.8, 227.0, 0.0f });
-	light->appendVertex({ 343.0, 547.8, 332.0, 0.0f });
-	light->appendVertex({ 213.0, 547.8, 332.0, 0.0f });
-	light->appendVertex({ 213.0, 547.8, 227.0, 0.0f });
+	
+
+	
+
+	light->appendVertex({ 343.0, ligthY, 227.0, 0.0f });
+	light->appendVertex({ 343.0, ligthY, 332.0, 0.0f });
+	light->appendVertex({ 213.0, ligthY, 332.0, 0.0f });
+	light->appendVertex({ 213.0, ligthY, 227.0, 0.0f });
 
 	light->appendIndex(0);
 	light->appendIndex(1);
@@ -176,24 +201,134 @@ int main() {
 	leftWall->appendIndex(0);
 
 
-	
-
 	Mesh_t* box1 = new IndexedMesh<TRIANGLE>(format);
 
-	box1->appendVertex({ 130.0, 165.0,  65.0, 1.0f, 1.0f, 1.0f });
-	box1->appendVertex({ 82.0, 165.0, 225.0, 1.0f, 1.0f, 1.0f });
-	box1->appendVertex({ 240.0, 165.0, 272.0, 1.0f, 1.0f, 1.0f });
-	box1->appendVertex({ 290.0, 165.0, 114.0, 1.0f, 1.0f, 1.0f });
+	box1->appendVertex({ 130.0, 165.0,  65.0, 1.0f });
+	box1->appendVertex({  82.0, 165.0, 225.0, 1.0f });
+	box1->appendVertex({ 240.0, 165.0, 272.0, 1.0f });
+	box1->appendVertex({ 290.0, 165.0, 114.0, 1.0f });
 
-	box1->appendVertex({ 552.8f,    0.0f,			   0.0f, 1.0f, 1.0f, 1.0f });
-	box1->appendVertex({ 549.6f,    0.0f,			 559.2f, 1.0f, 1.0f, 1.0f });
-	box1->appendVertex({ 556.0f,    548.8f,		 559.2f, 1.0f, 1.0f, 1.0f });
-	box1->appendVertex({ 556.0f,    548.8f,      0.0f, 1.0f, 1.0f, 1.0f });
+	box1->appendVertex({ 130.0,   0.0,  65.0, 1.0f });
+	box1->appendVertex({ 82.0,		0.0, 225.0, 1.0f });
+	box1->appendVertex({ 240.0,		0.0, 272.0, 1.0f });
+	box1->appendVertex({ 290.0,		0.0, 114.0, 1.0f });
+
+	//face up
+	box1->appendIndex(0);
+	box1->appendIndex(1);
+	box1->appendIndex(2);
+
+	box1->appendIndex(2);
+	box1->appendIndex(3);
+	box1->appendIndex(0);
+
+	//face left
+
+	box1->appendIndex(4);
+	box1->appendIndex(5);
+	box1->appendIndex(0);
+
+
+	box1->appendIndex(0);
+	box1->appendIndex(5);
+	box1->appendIndex(1);
+
+	//face back
+	box1->appendIndex(1);
+	box1->appendIndex(6);
+	box1->appendIndex(2);
+
+	box1->appendIndex(6);
+	box1->appendIndex(1);
+	box1->appendIndex(5);
+
+	//face right
+
+	box1->appendIndex(3);
+	box1->appendIndex(2);
+	box1->appendIndex(7);
+
+	box1->appendIndex(7);
+	box1->appendIndex(2);
+	box1->appendIndex(6);
+
+
+	//face forward
+	box1->appendIndex(0);
+	box1->appendIndex(3);
+	box1->appendIndex(4);
+
+	box1->appendIndex(4);
+	box1->appendIndex(3);
+	box1->appendIndex(7);
+	
+
+
+	Mesh_t* box2 = new IndexedMesh<TRIANGLE>(format);
+
+	box2->appendVertex({ 423.0, 330.0, 247.0, 1.0f });
+	box2->appendVertex({ 265.0, 330.0, 296.0, 1.0f });
+	box2->appendVertex({ 314.0, 330.0, 456.0, 1.0f });
+	box2->appendVertex({ 472.0, 330.0, 406.0, 1.0f });
+
+	box2->appendVertex({ 423.0, 0.0, 247.0, 1.0f });
+	box2->appendVertex({ 265.0, 0.0, 296.0, 1.0f });
+	box2->appendVertex({ 314.0, 0.0, 456.0, 1.0f });
+	box2->appendVertex({ 472.0, 0.0, 406.0, 1.0f });
+
+	//face up
+	box2->appendIndex(0);
+	box2->appendIndex(1);
+	box2->appendIndex(2);
+
+	box2->appendIndex(2);
+	box2->appendIndex(3);
+	box2->appendIndex(0);
+
+	//face left
+
+	box2->appendIndex(4);
+	box2->appendIndex(5);
+	box2->appendIndex(0);
+
+
+	box2->appendIndex(0);
+	box2->appendIndex(5);
+	box2->appendIndex(1);
+
+	//face back
+	box2->appendIndex(1);
+	box2->appendIndex(6);
+	box2->appendIndex(2);
+
+	box2->appendIndex(6);
+	box2->appendIndex(1);
+	box2->appendIndex(5);
+
+	//face right
+
+	box2->appendIndex(3);
+	box2->appendIndex(2);
+	box2->appendIndex(7);
+
+	box2->appendIndex(7);
+	box2->appendIndex(2);
+	box2->appendIndex(6);
+
+
+	//face forward
+	box2->appendIndex(0);
+	box2->appendIndex(3);
+	box2->appendIndex(4);
+
+	box2->appendIndex(4);
+	box2->appendIndex(3);
+	box2->appendIndex(7);
 
 
 
 	//creating an allocating a vertex buffer
-	VertexBuffer* triangle_vertex_buffer = new VertexBuffer({ light,ceiling, leftWall, rightWall, floor, backWall });
+	VertexBuffer* triangle_vertex_buffer = new VertexBuffer({ light,ceiling, leftWall, rightWall, floor, backWall,box1,box2 });
 	triangle_vertex_buffer->allocate(queue, commandBuffer, VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
 
 	VkTransformMatrixKHR transformMatrixKHR = { 1,0,0,0,
@@ -220,16 +355,18 @@ int main() {
 	//we create a indexed triangle mesh with the desired format
 	
 
+
+
 	StorageImage output(size.width, size.height, 1, s->imageFormat());
 	output.allocate(queue, commandBuffer);
 
 	UniformBuffer proj;
 
-	proj.addVariable("CameraPos", &vec4f({ 278, 273, -80,0 }));
+	proj.addVariable("CameraPos", &vec4f({ 278, 273, -800,0 }));
 	proj.addVariable("Direction", &vec4f({ 0, 0, 1,0 }));
 	proj.addVariable("horizontal", &vec4f({ 1, 0, 0,0 }));
 	proj.addVariable("Up", &vec3f({ 0, 1, 0}));
-	proj.addVariable("focale", 0.35f);
+	proj.addVariable("focale", 1.4f);
 	proj.addVariable("width", 0.025f);
 	proj.addVariable("height", 0.025f);
 
@@ -248,6 +385,7 @@ int main() {
 	rtPipeline.addBuffer(&triangle_vertex_buffer->getIndexBuffer(), VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 4);
 	rtPipeline.addUniformBuffer(&materialBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 5);
 	rtPipeline.addUniformBuffer(&sampleBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 6);
+	rtPipeline.addUniformBuffer(&lightSampleBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 7);
 	rtPipeline.addRayGenModule(&rayGenShaderModule);
 	rtPipeline.addMissModule(&missShaderModule);
 
@@ -291,8 +429,8 @@ int main() {
 	RenderPass* showPass = new RenderPass();
 
 	GraphicPipeline* pipeline = new GraphicPipeline(vec3f({ 0,0,0 }), vec3f({ float(size.width),float(size.height),1.0f }), vec2f({ 0,0 }), vec2f({ float(size.width),float(size.height) }));
-	VertexShaderModule* vertexShader = new VertexShaderModule("Data/Shaders/HelloWorld/shader.vert.spv");
-	FragmentShaderModule* fragmentShader = new FragmentShaderModule("Data/Shaders/HelloWorld/shader.frag.spv");
+	VertexShaderModule* vertexShader = new VertexShaderModule("Data/Shaders/CornellBox/shader.vert.spv");
+	FragmentShaderModule* fragmentShader = new FragmentShaderModule("Data/Shaders/CornellBox/shader.frag.spv");
 	pipeline->setVextexModule(vertexShader);
 	pipeline->setFragmentModule(fragmentShader);
 	pipeline->setVertices(quad_vertex_buffer);
@@ -317,6 +455,26 @@ int main() {
 	std::vector<VkBufferMemoryBarrier> seed_memory_barriers;
 	std::vector<VkBufferMemoryBarrier> print_memory_barriers;
 
+	bool first = true;
+
+
+	commandBuffer.resetFence();
+	commandBuffer.beginRecord();
+
+
+	if (first) {
+		materialBuffer.update(commandBuffer);
+		sampleBuffer.update(commandBuffer);
+		lightSampleBuffer.update(commandBuffer);
+		proj.update(commandBuffer);
+	}
+	rtPipeline.trace(commandBuffer);
+	commandBuffer.endRecord();
+
+	commandBuffer.submit(queue, {}, {});
+
+	commandBuffer.wait(UINT64_MAX);
+	commandBuffer.resetFence();
 
 	while (w.running()) {
 		w.updateInput();
@@ -324,23 +482,11 @@ int main() {
 		VkDevice logical = d->getLogicalDevice();
 		VkSwapchainKHR& swapchain = s->getHandle();
 		
-		commandBuffer.wait(2000000000);
-		commandBuffer.resetFence();
-		commandBuffer.beginRecord();
-
-		materialBuffer.update(commandBuffer);
-		sampleBuffer.update(commandBuffer);
-		proj.update(commandBuffer);
-		rtPipeline.trace(commandBuffer);
-		commandBuffer.endRecord();
-
-		if (!SubmitCommandBuffersToQueue(queue->getHandle(), {}, { commandBuffer.getHandle() }, {}, commandBuffer.getFence())) {
-			continue;
+		if (first) {
+			commandBuffer.wait(2000000000);
+			first = false;
 		}
-
 		
-		commandBuffer.wait(2000000000);
-		commandBuffer.resetFence();
 
 		SwapChainImage& image = s->AcquireImage();
 
@@ -361,10 +507,7 @@ int main() {
 		
 		commandBuffer.endRecord();
 
-
-		if (!SubmitCommandBuffersToQueue(queue->getHandle(), wait_semaphore_infos, { commandBuffer.getHandle() }, { commandBuffer.getSemaphore(0) }, commandBuffer.getFence())) {
-			continue;
-		}
+		commandBuffer.submit(queue, wait_semaphore_infos, { commandBuffer.getSemaphore(0) });
 
 
 		PresentInfo present_info = {

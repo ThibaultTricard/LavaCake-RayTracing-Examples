@@ -179,9 +179,7 @@ int main() {
 		rtPipeline.trace(commandBuffer);
 		commandBuffer.endRecord();
 
-		if (!SubmitCommandBuffersToQueue(queue->getHandle(), {}, { commandBuffer.getHandle() }, {}, commandBuffer.getFence())) {
-			continue;
-		}
+		commandBuffer.submit(queue, {}, { });
 
 		
 		commandBuffer.wait(2000000000);
@@ -207,9 +205,7 @@ int main() {
 		commandBuffer.endRecord();
 
 
-		if (!SubmitCommandBuffersToQueue(queue->getHandle(), wait_semaphore_infos, { commandBuffer.getHandle() }, { commandBuffer.getSemaphore(0) }, commandBuffer.getFence())) {
-			continue;
-		}
+		commandBuffer.submit(queue, wait_semaphore_infos, { commandBuffer.getSemaphore(0) });
 
 
 		PresentInfo present_info = {

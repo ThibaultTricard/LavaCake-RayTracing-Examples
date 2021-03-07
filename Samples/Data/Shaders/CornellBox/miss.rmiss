@@ -4,6 +4,7 @@ struct RayPayload {
 	vec3 color;
 	int depth;
 	bool missed;
+  	bool lightRay;
 };
 layout(location = 0) rayPayloadInEXT RayPayload hitValue;
 

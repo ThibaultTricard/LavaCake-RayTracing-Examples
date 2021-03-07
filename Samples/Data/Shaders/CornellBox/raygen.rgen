@@ -18,6 +18,7 @@ struct RayPayload {
 	vec3 color;
 	int depth;
 	bool missed;
+  bool lightRay;
 };
 
 layout(location = 0) rayPayloadEXT RayPayload hitValue;
@@ -37,6 +38,8 @@ void main()
 
     hitValue.color = vec3(0.0);
     hitValue.depth = 0;
+    hitValue.missed = false;
+    hitValue.lightRay = false;
     traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, cam.cameraPos.xyz, tmin, rayDir, tmax, 0);
 
     
