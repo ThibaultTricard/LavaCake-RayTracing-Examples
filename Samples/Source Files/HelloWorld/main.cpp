@@ -199,7 +199,7 @@ int main() {
 		showPass->setSwapChainImage(*frameBuffer, image);
 
 
-		showPass->draw(commandBuffer.getHandle(), frameBuffer->getHandle(), vec2u({ 0,0 }), vec2u({ size.width, size.height }), { { 0.1f, 0.2f, 0.3f, 1.0f }, { 1.0f, 0 } });
+		showPass->draw(commandBuffer, *frameBuffer, vec2u({ 0,0 }), vec2u({ size.width, size.height }), { { 0.1f, 0.2f, 0.3f, 1.0f }, { 1.0f, 0 } });
 
 		
 		commandBuffer.endRecord();

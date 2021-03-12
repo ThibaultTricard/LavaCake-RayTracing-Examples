@@ -325,8 +325,6 @@ int main() {
 	box2->appendIndex(3);
 	box2->appendIndex(7);
 
-
-
 	//creating an allocating a vertex buffer
 	VertexBuffer* triangle_vertex_buffer = new VertexBuffer({ light,ceiling, leftWall, rightWall, floor, backWall,box1,box2 });
 	triangle_vertex_buffer->allocate(queue, commandBuffer, VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
@@ -349,13 +347,9 @@ int main() {
 
 	TopLevelAS tlAS;
 
-
 	tlAS.addInstance(&blAS, transformMatrixKHR, 0, 0);
 	tlAS.alloctate(queue, commandBuffer, false);
 	//we create a indexed triangle mesh with the desired format
-	
-
-
 
 	StorageImage output(size.width, size.height, 1, s->imageFormat());
 	output.allocate(queue, commandBuffer);
@@ -502,7 +496,7 @@ int main() {
 		showPass->setSwapChainImage(*frameBuffer, image);
 
 
-		showPass->draw(commandBuffer.getHandle(), frameBuffer->getHandle(), vec2u({ 0,0 }), vec2u({ size.width, size.height }), { { 0.1f, 0.2f, 0.3f, 1.0f }, { 1.0f, 0 } });
+		showPass->draw(commandBuffer, *frameBuffer, vec2u({ 0,0 }), vec2u({ size.width, size.height }), { { 0.1f, 0.2f, 0.3f, 1.0f }, { 1.0f, 0 } });
 
 		
 		commandBuffer.endRecord();

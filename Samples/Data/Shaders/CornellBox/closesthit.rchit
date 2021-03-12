@@ -94,7 +94,7 @@ void main()
 
     if(depth < 4)
     {
-      for(int i = 0; i < 32; i++){
+      for(int i = 0; i < 1; i++){
         vec3 rayDir = normalize(lightSamples.dir[i].xyz - origin);
 
         float theta = dot(rayDir, n);
@@ -105,7 +105,7 @@ void main()
 
         irradiance+= hitValue.color * theta;
       }
-      irradiance  =  irradiance / 32.0;
+      irradiance  =  irradiance / 1.0;
   	  
       result = irradiance;
 
