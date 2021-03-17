@@ -4,7 +4,7 @@
 #include "glfw3.h"
 #include "glfw3native.h"
 
-
+#define RAYTRACING
 #include "RayTracing/RayTracingPipeline.h"
 #include "RayTracing/BottomLevelAS.h"
 
@@ -141,7 +141,7 @@ int main() {
 	GraphicPipeline* pipeline = new GraphicPipeline(vec3f({ 0,0,0 }), vec3f({ float(size.width),float(size.height),1.0f }), vec2f({ 0,0 }), vec2f({ float(size.width),float(size.height) }));
 	VertexShaderModule* vertexShader = new VertexShaderModule("Data/Shaders/HelloWorld/shader.vert.spv");
 	FragmentShaderModule* fragmentShader = new FragmentShaderModule("Data/Shaders/HelloWorld/shader.frag.spv");
-	pipeline->setVextexModule(vertexShader);
+	pipeline->setVertexModule(vertexShader);
 	pipeline->setFragmentModule(fragmentShader);
 	pipeline->setVertices(quad_vertex_buffer);
 	pipeline->addStorageImage(&output, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
@@ -185,7 +185,7 @@ int main() {
 		commandBuffer.wait(2000000000);
 		commandBuffer.resetFence();
 
-		SwapChainImage& image = s->AcquireImage();
+		SwapChainImage& image = s->acquireImage();
 
 		std::vector<WaitSemaphoreInfo> wait_semaphore_infos = {};
 		wait_semaphore_infos.push_back({
