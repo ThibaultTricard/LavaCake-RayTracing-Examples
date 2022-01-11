@@ -16,6 +16,6 @@ git submodule update --recursive --init
 
 cd Lavacake
 
-git checkout origin/dev-1.2 --track
+git checkout origin/dev-1.3 --track
 
 Then use Cmake
