@@ -444,7 +444,7 @@ int main() {
 	showPass->compile();
 
 	FrameBuffer* frameBuffer = new FrameBuffer(s->size().width, s->size().height);
-	showPass->prepareOutputFrameBuffer(*frameBuffer);
+	showPass->prepareOutputFrameBuffer(queue, commandBuffer, *frameBuffer);
 
 	std::vector<VkBufferMemoryBarrier> seed_memory_barriers;
 	std::vector<VkBufferMemoryBarrier> print_memory_barriers;
